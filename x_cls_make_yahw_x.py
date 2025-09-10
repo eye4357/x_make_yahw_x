@@ -12,4 +12,6 @@ def main() -> str:
 
 
 if __name__ == "__main__":
-    print(main())
+    from x_make_common_x.helpers import info as _info
+
+    _info(main())
