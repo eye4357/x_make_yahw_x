@@ -17,7 +17,6 @@ if __name__ == "__main__":
 
     _LOGGER = logging.getLogger("x_make")
 
-
     def _info(*args: object) -> None:
         msg = " ".join(str(a) for a in args)
         try:
