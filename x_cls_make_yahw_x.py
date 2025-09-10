@@ -12,6 +12,24 @@ def main() -> str:
 
 
 if __name__ == "__main__":
-    from x_make_common_x.helpers import info as _info
+    import logging
+    import sys as _sys
+
+    _LOGGER = logging.getLogger("x_make")
+
+
+    def _info(*args: object) -> None:
+        msg = " ".join(str(a) for a in args)
+        try:
+            _LOGGER.info("%s", msg)
+        except Exception:
+            pass
+        try:
+            print(msg)
+        except Exception:
+            try:
+                _sys.stdout.write(msg + "\n")
+            except Exception:
+                pass
 
     _info(main())
