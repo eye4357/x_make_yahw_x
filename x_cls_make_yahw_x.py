@@ -1,4 +1,9 @@
-class x_cls_make_yahw_x:
+from __future__ import annotations
+
+from contextlib import suppress
+
+
+class XClsMakeYahwX:
     def __init__(self, ctx: object | None = None) -> None:
         # store optional orchestrator context for backward-compatible upgrades
         self._ctx = ctx
@@ -8,7 +13,7 @@ class x_cls_make_yahw_x:
 
 
 def main() -> str:
-    return x_cls_make_yahw_x().run()
+    return XClsMakeYahwX().run()
 
 
 if __name__ == "__main__":
@@ -19,16 +24,20 @@ if __name__ == "__main__":
 
     def _info(*args: object) -> None:
         msg = " ".join(str(a) for a in args)
-        try:
+        with suppress(Exception):
             _LOGGER.info("%s", msg)
-        except Exception:
-            pass
+        if not _emit_print(msg):
+            with suppress(Exception):
+                _sys.stdout.write(msg + "\n")
+
+    def _emit_print(msg: str) -> bool:
         try:
             print(msg)
         except Exception:
-            try:
-                _sys.stdout.write(msg + "\n")
-            except Exception:
-                pass
+            return False
+        return True
 
     _info(main())
+
+
+x_cls_make_yahw_x = XClsMakeYahwX
