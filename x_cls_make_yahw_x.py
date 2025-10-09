@@ -31,11 +31,10 @@ if __name__ == "__main__":
                 _sys.stdout.write(msg + "\n")
 
     def _emit_print(msg: str) -> bool:
-        try:
+        with suppress(Exception):
             print(msg)
-        except Exception:
-            return False
-        return True
+            return True
+        return False
 
     _info(main())
 
