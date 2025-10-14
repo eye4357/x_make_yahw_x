@@ -2,6 +2,10 @@
 
 All notable changes to x_make_yahw_x are logged here. We respect [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and Semantic Versioning even for the smallest harness—consistency keeps the lab honest.
 
+## [0.20.2] - 2025-10-14
+### Changed
+- Updated the documentation to mark the Road to 0.20.2 checkpoint and reinforce the baseline verification role of this harness.
+
 ## [0.20.1] - 2025-10-13
 ### Changed
 - Updated README references to the Road to 0.20.1 release hub and proposal so the hello-world harness mirrors the active milestone.
