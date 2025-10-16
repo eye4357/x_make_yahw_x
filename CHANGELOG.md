@@ -2,6 +2,11 @@
 
 All notable changes to x_make_yahw_x are logged here. We respect [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and Semantic Versioning even for the smallest harness—consistency keeps the lab honest.
 
+## [0.20.4] - 2025-10-15
+### Changed
+- README updated for the Road to 0.20.4 release, documenting the Kanban intake checks and exporter smoke tests this harness now performs.
+- Control notes refreshed to remind operators to capture greeting run evidence in `make_all_summary.json` before lighting heavier pipelines.
+
 ## [0.20.3] - 2025-10-14
 ### Changed
 - README refreshed to note the Road to 0.20.3 telemetry capture baked into the harness runs.
