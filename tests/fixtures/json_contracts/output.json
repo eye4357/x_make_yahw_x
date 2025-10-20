@@ -1,0 +1,8 @@
+{
+  "status": "success",
+  "schema_version": "x_make_yahw_x.run/1.0",
+  "message": "Hello world!",
+  "metadata": {
+    "timestamp": "2025-10-18T00:00:00Z"
+  }
+}

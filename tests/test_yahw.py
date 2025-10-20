@@ -4,8 +4,11 @@ from __future__ import annotations
 
 # ruff: noqa: S101
 import importlib.util
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
+
+import pytest
 
 from x_make_yahw_x import x_cls_make_yahw_x as yahw_module
 from x_make_yahw_x.x_cls_make_yahw_x import XClsMakeYahwX, main
@@ -40,16 +43,25 @@ def test_main_invokes_runner(monkeypatch: MonkeyPatch) -> None:
     assert captured == {"created": True, "called": True}
 
 
-def test_module_entrypoint_logs_output(capsys: CaptureFixture[str]) -> None:
-    # Simulate running the module directly by invoking the logging helper
+def test_module_entrypoint_requires_json(
+    capsys: CaptureFixture[str], monkeypatch: MonkeyPatch
+) -> None:
+    # Simulate running the module directly without JSON arguments
+    module_file = getattr(yahw_module, "__file__", None)
+    assert isinstance(module_file, str)
+    module_path = Path(module_file).resolve()
     spec = importlib.util.spec_from_file_location(
         "__main__",
-        Path(yahw_module.__file__).resolve(),
+        module_path,
     )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    monkeypatch.setattr(sys, "argv", [str(module_path)])
 
-    out = capsys.readouterr().out
-    assert "Hello world!" in out
+    with pytest.raises(SystemExit) as excinfo:
+        spec.loader.exec_module(module)
+
+    assert excinfo.value.code == 2
+    output = capsys.readouterr()
+    assert "JSON input required" in output.err

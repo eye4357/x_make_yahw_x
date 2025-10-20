@@ -1,0 +1,7 @@
+{
+  "status": "failure",
+  "message": "Unable to generate greeting",
+  "details": {
+    "reason": "missing configuration"
+  }
+}

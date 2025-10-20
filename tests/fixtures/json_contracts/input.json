@@ -1,0 +1,8 @@
+{
+  "command": "x_make_yahw_x",
+  "parameters": {
+    "context": {
+      "invoked_by": "integration-test"
+    }
+  }
+}
