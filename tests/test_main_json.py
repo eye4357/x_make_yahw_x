@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import importlib
-from collections.abc import Mapping
 from types import SimpleNamespace
-from typing import cast
+from typing import TYPE_CHECKING, cast
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 import pytest
 from x_make_common_x.json_contracts import validate_payload

@@ -30,7 +30,9 @@ def main() -> str:
 SCHEMA_VERSION = "x_make_yahw_x.run/1.0"
 
 
-def _failure_payload(message: str, *, details: Mapping[str, object] | None = None) -> dict[str, object]:
+def _failure_payload(
+    message: str, *, details: Mapping[str, object] | None = None
+) -> dict[str, object]:
     payload: dict[str, object] = {"status": "failure", "message": message}
     if details:
         payload["details"] = dict(details)
@@ -41,7 +43,9 @@ def _failure_payload(message: str, *, details: Mapping[str, object] | None = Non
     return payload
 
 
-def _build_context(ctx: object | None, overrides: Mapping[str, object] | None) -> object | None:
+def _build_context(
+    ctx: object | None, overrides: Mapping[str, object] | None
+) -> object | None:
     if not overrides:
         return ctx
     namespace = SimpleNamespace(**{str(key): value for key, value in overrides.items()})
@@ -50,7 +54,9 @@ def _build_context(ctx: object | None, overrides: Mapping[str, object] | None) -
     return namespace
 
 
-def main_json(payload: Mapping[str, object], *, ctx: object | None = None) -> dict[str, object]:
+def main_json(
+    payload: Mapping[str, object], *, ctx: object | None = None
+) -> dict[str, object]:
     try:
         validate_payload(payload, INPUT_SCHEMA)
     except ValidationError as exc:
@@ -66,7 +72,10 @@ def main_json(payload: Mapping[str, object], *, ctx: object | None = None) -> di
     parameters_obj = payload.get("parameters", {})
     parameters = cast("Mapping[str, object]", parameters_obj)
     context_obj = parameters.get("context")
-    context_mapping = cast("Mapping[str, object] | None", context_obj if isinstance(context_obj, Mapping) else None)
+    context_mapping = cast(
+        "Mapping[str, object] | None",
+        context_obj if isinstance(context_obj, Mapping) else None,
+    )
 
     runtime_ctx = _build_context(ctx, context_mapping)
 
@@ -124,7 +133,9 @@ def _load_json_payload(file_path: str | None) -> Mapping[str, object]:
 
 def _run_json_cli(args: Sequence[str]) -> None:
     parser = argparse.ArgumentParser(description="x_make_yahw_x JSON runner")
-    parser.add_argument("--json", action="store_true", help="Read JSON payload from stdin")
+    parser.add_argument(
+        "--json", action="store_true", help="Read JSON payload from stdin"
+    )
     parser.add_argument("--json-file", type=str, help="Path to JSON payload file")
     parsed = parser.parse_args(args)
 
