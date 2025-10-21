@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, cast
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-import pytest
+    import pytest
 from x_make_common_x.json_contracts import validate_payload
 
 from x_make_yahw_x.json_contracts import ERROR_SCHEMA, OUTPUT_SCHEMA

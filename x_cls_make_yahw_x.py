@@ -4,6 +4,7 @@ import argparse
 import json
 import sys
 from collections.abc import Mapping, Sequence
+from contextlib import suppress
 from pathlib import Path
 from types import SimpleNamespace
 from typing import cast
@@ -29,6 +30,8 @@ def main() -> str:
 
 SCHEMA_VERSION = "x_make_yahw_x.run/1.0"
 
+ValidationErrorType = cast("type[Exception]", ValidationError)
+
 
 def _failure_payload(
     message: str, *, details: Mapping[str, object] | None = None
@@ -36,10 +39,8 @@ def _failure_payload(
     payload: dict[str, object] = {"status": "failure", "message": message}
     if details:
         payload["details"] = dict(details)
-    try:
+    with suppress(ValidationErrorType):
         validate_payload(payload, ERROR_SCHEMA)
-    except ValidationError:
-        pass
     return payload
 
 
