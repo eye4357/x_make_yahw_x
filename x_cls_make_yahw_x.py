@@ -97,8 +97,9 @@ def main_json(
 
     metadata: dict[str, object] = {}
     if context_mapping:
-        metadata["context_keys"] = sorted(str(key) for key in context_mapping.keys())
-        metadata["context_entries"] = len(metadata["context_keys"])
+        context_keys = tuple(sorted(str(key) for key in context_mapping.keys()))
+        metadata["context_keys"] = list(context_keys)
+        metadata["context_entries"] = len(context_keys)
     if runtime_ctx is not ctx and runtime_ctx is not None and ctx is not None:
         metadata["parent_ctx_attached"] = True
 

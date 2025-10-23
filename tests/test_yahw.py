@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 # ruff: noqa: S101
+import importlib
 import importlib.util
 import sys
 from pathlib import Path
@@ -10,8 +11,9 @@ from typing import TYPE_CHECKING
 
 import pytest
 
-from x_make_yahw_x import x_cls_make_yahw_x as yahw_module
 from x_make_yahw_x.x_cls_make_yahw_x import XClsMakeYahwX, main
+
+yahw_module = importlib.import_module("x_make_yahw_x.x_cls_make_yahw_x")
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
