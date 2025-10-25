@@ -2,18 +2,30 @@
 
 from __future__ import annotations
 
-# ruff: noqa: S101
 import importlib
 import importlib.util
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, NoReturn
 
 import pytest
 
 from x_make_yahw_x.x_cls_make_yahw_x import XClsMakeYahwX, main
 
 yahw_module = importlib.import_module("x_make_yahw_x.x_cls_make_yahw_x")
+
+EXPECTED_USAGE_ERROR = 2
+
+
+def _raise_failure(message: str) -> NoReturn:
+    failure_message = message
+    raise AssertionError(failure_message)
+
+
+def expect(*, condition: bool, message: str) -> None:
+    if not condition:
+        _raise_failure(message)
+
 
 if TYPE_CHECKING:
     from _pytest.capture import CaptureFixture
@@ -25,7 +37,7 @@ def test_run_returns_greeting() -> None:
 
     result = greeter.run()
 
-    assert result == "Hello world!"
+    expect(condition=result == "Hello world!", message="Default greeting mismatch")
 
 
 def test_main_invokes_runner(monkeypatch: MonkeyPatch) -> None:
@@ -41,8 +53,11 @@ def test_main_invokes_runner(monkeypatch: MonkeyPatch) -> None:
 
     monkeypatch.setattr(yahw_module, "XClsMakeYahwX", FakeRunner)
 
-    assert main() == "hi"
-    assert captured == {"created": True, "called": True}
+    expect(condition=main() == "hi", message="Runner result mismatch")
+    expect(
+        condition=captured == {"created": True, "called": True},
+        message="Runner lifecycle events not captured",
+    )
 
 
 def test_module_entrypoint_requires_json(
@@ -50,20 +65,30 @@ def test_module_entrypoint_requires_json(
 ) -> None:
     # Simulate running the module directly without JSON arguments
     module_file = getattr(yahw_module, "__file__", None)
-    assert isinstance(module_file, str)
+    if not isinstance(module_file, str):
+        _raise_failure("Module __file__ must be a string")
     module_path = Path(module_file).resolve()
     spec = importlib.util.spec_from_file_location(
         "__main__",
         module_path,
     )
-    assert spec is not None
-    assert spec.loader is not None
+    if spec is None:
+        _raise_failure("Expected importlib spec")
+    loader = spec.loader
+    if loader is None:
+        _raise_failure("Expected importlib loader")
     module = importlib.util.module_from_spec(spec)
     monkeypatch.setattr(sys, "argv", [str(module_path)])
 
     with pytest.raises(SystemExit) as excinfo:
-        spec.loader.exec_module(module)
+        loader.exec_module(module)
 
-    assert excinfo.value.code == 2
+    expect(
+        condition=excinfo.value.code == EXPECTED_USAGE_ERROR,
+        message="Unexpected exit code",
+    )
     output = capsys.readouterr()
-    assert "JSON input required" in output.err
+    expect(
+        condition="JSON input required" in output.err,
+        message="Missing usage guidance for JSON input",
+    )

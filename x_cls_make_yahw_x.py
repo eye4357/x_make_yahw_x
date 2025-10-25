@@ -51,7 +51,7 @@ def _build_context(
         return ctx
     namespace = SimpleNamespace(**{str(key): value for key, value in overrides.items()})
     if ctx is not None:
-        namespace._parent_ctx = ctx
+        namespace.parent_ctx = ctx
     return namespace
 
 
@@ -97,7 +97,7 @@ def main_json(
 
     metadata: dict[str, object] = {}
     if context_mapping:
-        context_keys = tuple(sorted(str(key) for key in context_mapping.keys()))
+        context_keys = tuple(sorted(str(key) for key in context_mapping))
         metadata["context_keys"] = list(context_keys)
         metadata["context_entries"] = len(context_keys)
     if runtime_ctx is not ctx and runtime_ctx is not None and ctx is not None:
