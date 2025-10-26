@@ -1,18 +1,36 @@
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import sys
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
 from pathlib import Path
 from types import SimpleNamespace
-from typing import cast
+from typing import IO, Protocol, cast
 
-from jsonschema import ValidationError
 from x_make_common_x.json_contracts import validate_payload
 
 from x_make_yahw_x.json_contracts import ERROR_SCHEMA, INPUT_SCHEMA, OUTPUT_SCHEMA
+
+
+class _SchemaValidationError(Exception):
+    message: str
+    path: tuple[object, ...]
+    schema_path: tuple[object, ...]
+
+
+class _JsonSchemaModule(Protocol):
+    ValidationError: type[_SchemaValidationError]
+
+
+def _load_validation_error() -> type[_SchemaValidationError]:
+    module = cast("_JsonSchemaModule", importlib.import_module("jsonschema"))
+    return module.ValidationError
+
+
+ValidationErrorType: type[_SchemaValidationError] = _load_validation_error()
 
 
 class XClsMakeYahwX:
@@ -29,8 +47,6 @@ def main() -> str:
 
 
 SCHEMA_VERSION = "x_make_yahw_x.run/1.0"
-
-ValidationErrorType = cast("type[Exception]", ValidationError)
 
 
 def _failure_payload(
@@ -60,7 +76,7 @@ def main_json(
 ) -> dict[str, object]:
     try:
         validate_payload(payload, INPUT_SCHEMA)
-    except ValidationError as exc:
+    except ValidationErrorType as exc:
         return _failure_payload(
             "input payload failed validation",
             details={
@@ -113,7 +129,7 @@ def main_json(
 
     try:
         validate_payload(result_payload, OUTPUT_SCHEMA)
-    except ValidationError as exc:
+    except ValidationErrorType as exc:
         return _failure_payload(
             "generated output failed schema validation",
             details={
@@ -127,10 +143,17 @@ def main_json(
 
 
 def _load_json_payload(file_path: str | None) -> Mapping[str, object]:
+    def _load(handle: IO[str]) -> Mapping[str, object]:
+        payload_obj: object = json.load(handle)
+        if not isinstance(payload_obj, dict):
+            message = "JSON payload must be an object"
+            raise TypeError(message)
+        return cast("dict[str, object]", payload_obj)
+
     if file_path:
         with Path(file_path).open("r", encoding="utf-8") as handle:
-            return cast("Mapping[str, object]", json.load(handle))
-    return cast("Mapping[str, object]", json.load(sys.stdin))
+            return _load(handle)
+    return _load(sys.stdin)
 
 
 def _run_json_cli(args: Sequence[str]) -> None:
@@ -140,11 +163,15 @@ def _run_json_cli(args: Sequence[str]) -> None:
     )
     parser.add_argument("--json-file", type=str, help="Path to JSON payload file")
     parsed = parser.parse_args(args)
+    json_flag_obj = cast("object", getattr(parsed, "json", False))
+    json_flag = bool(json_flag_obj)
+    json_file_obj = cast("object", getattr(parsed, "json_file", None))
+    json_file = json_file_obj if isinstance(json_file_obj, str) else None
 
-    if not (parsed.json or parsed.json_file):
+    if not (json_flag or json_file):
         parser.error("JSON input required. Use --json for stdin or --json-file <path>.")
 
-    payload = _load_json_payload(parsed.json_file if parsed.json_file else None)
+    payload = _load_json_payload(json_file if json_file else None)
     result = main_json(payload)
     json.dump(result, sys.stdout, indent=2)
     sys.stdout.write("\n")

@@ -3,16 +3,17 @@
 from __future__ import annotations
 
 import importlib
+import importlib.abc
 import importlib.util
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, NoReturn
+from typing import TYPE_CHECKING, NoReturn, cast
 
 import pytest
 
 from x_make_yahw_x.x_cls_make_yahw_x import XClsMakeYahwX, main
 
-yahw_module = importlib.import_module("x_make_yahw_x.x_cls_make_yahw_x")
+yahw_module: ModuleType = importlib.import_module("x_make_yahw_x.x_cls_make_yahw_x")
 
 EXPECTED_USAGE_ERROR = 2
 
@@ -28,6 +29,8 @@ def expect(*, condition: bool, message: str) -> None:
 
 
 if TYPE_CHECKING:
+    from types import ModuleType
+
     from _pytest.capture import CaptureFixture
     from _pytest.monkeypatch import MonkeyPatch
 
@@ -64,9 +67,10 @@ def test_module_entrypoint_requires_json(
     capsys: CaptureFixture[str], monkeypatch: MonkeyPatch
 ) -> None:
     # Simulate running the module directly without JSON arguments
-    module_file = getattr(yahw_module, "__file__", None)
-    if not isinstance(module_file, str):
+    module_file_obj = cast("object", getattr(yahw_module, "__file__", None))
+    if not isinstance(module_file_obj, str):
         _raise_failure("Module __file__ must be a string")
+    module_file = module_file_obj
     module_path = Path(module_file).resolve()
     spec = importlib.util.spec_from_file_location(
         "__main__",
@@ -74,10 +78,14 @@ def test_module_entrypoint_requires_json(
     )
     if spec is None:
         _raise_failure("Expected importlib spec")
-    loader = spec.loader
-    if loader is None:
+    loader_obj = spec.loader
+    if not isinstance(loader_obj, importlib.abc.Loader):
         _raise_failure("Expected importlib loader")
-    module = importlib.util.module_from_spec(spec)
+    loader = loader_obj
+    module_obj = importlib.util.module_from_spec(spec)
+    if module_obj is None:
+        _raise_failure("Expected module from spec")
+    module = module_obj
     monkeypatch.setattr(sys, "argv", [str(module_path)])
 
     with pytest.raises(SystemExit) as excinfo:
