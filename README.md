@@ -30,18 +30,8 @@ The run emits the greeting and registers evidence in the orchestrator summary. C
 | Static contract scan | `python -m pyright` |
 | Functional verification | `pytest` |
 
-## System Linkage
-- [Changelog](./CHANGELOG.md)
-- [Road to 0.20.4 Engineering Proposal](../x_0_make_all_x/Change%20Control/0.20.4/Road%20to%200.20.4%20Engineering%20Proposal.md)
-- [Road to 0.20.3 Engineering Proposal](../x_0_make_all_x/Change%20Control/0.20.3/Road%20to%200.20.3%20Engineering%20Proposal.md)
-
 ## Reconstitution Drill
 During the monthly rebuild I run this canary first: recreate the environment, execute the greeting, confirm the orchestrator logs the intake evidence, and record runtime plus interpreter version. Any surprise leads to immediate documentation and Change Control updates.
-
-## Cross-Referenced Assets
-- [x_make_common_x](../x_make_common_x/README.md) — showcases shared logging and subprocess helpers at minimum scale.
-- [x_make_github_visitor_x](../x_make_github_visitor_x/README.md) — inspects this repo to prove the compliance pipeline is awake.
-- [x_0_make_all_x](../x_0_make_all_x/README.md) — orchestrator refuses heavier workloads until this canary passes.
 
 ## Conduct Code
 Keep the sample tight. Any message change or behaviour shift must be justified in Change Control with verification steps. The baseline only moves when the evidence demands it.
