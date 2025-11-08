@@ -4,7 +4,6 @@ import importlib
 from typing import TYPE_CHECKING, NoReturn, cast
 
 from x_make_common_x.json_contracts import validate_payload
-
 from x_make_yahw_x.json_contracts import ERROR_SCHEMA, OUTPUT_SCHEMA
 from x_make_yahw_x.x_cls_make_yahw_x import XClsMakeYahwX, main_json
 
