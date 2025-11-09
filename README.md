@@ -21,6 +21,12 @@ This canary is the first executable every new environment touches. A simple gree
 
 The run emits the greeting and registers evidence in the orchestrator summary. Capture the JSON artefact alongside Change Control notes.
 
+### Latest Evidence Snapshot — 2025-11-09
+- Executed via Environment Studio plan `yahw_smoke` inside warehouse environment `x_venv_make_yahw_x`.
+- Run id `f99ea45499a04b44b6f4dc3f64ba342b` completed successfully in 6.266 seconds (Python 3.12; base image `mcr.microsoft.com/devcontainers/python:3.12`).
+- Output payload: `{"message": "Hello world!", "schema_version": "x_make_yahw_x.run/1.0", "status": "success"}` with context key `plan` recorded.
+- Evidence paths: run directory `c:/x_all_venv_x/runs/20251109_202817_f99ea45499a04b44b6f4dc3f64ba342b`, history entry `c:/x_all_venv_x/history/x_venv_make_yahw_x/20251109T202825Z_f99ea45499a04b44b6f4dc3f64ba342b.json`, plan bundle `c:/x_all_venv_x/studio_plans/20251109T202817Z-a7523a`.
+
 ## Evidence Checks
 | Check | Command |
 | --- | --- |

@@ -2,6 +2,10 @@
 
 I document every change to this intake canary here. Entries follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and Semantic Versioning so even the smallest harness remains accountable.
 
+## [Unreleased]
+### Documentation
+- Recorded the 2025-11-09 Environment Studio smoke run (`yahw_smoke` plan) and evidence locations in the operator README.
+
 ## [0.20.4] - 2025-10-15
 ### Changed
 - README updated for the Road to 0.20.4 release, documenting the Kanban intake checks and exporter smoke tests this harness now performs.
