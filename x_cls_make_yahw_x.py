@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import importlib
 import json
+import os
 import sys
 from collections.abc import Mapping, Sequence
 from contextlib import suppress
@@ -10,6 +11,18 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import IO, Protocol, cast
 
+from x_make_astrocyte_gateway_x import (
+    ExecutionPolicy,
+    ProjectionDataBundle,
+    ProjectionEdge,
+    ProjectionNetwork,
+    ProjectionNode,
+    ProjectionOrigin,
+    ProjectionResources,
+    ProjectionSnapshot,
+    ProjectionTelemetry,
+    write_snapshot,
+)
 from x_make_common_x.json_contracts import validate_payload
 from x_make_yahw_x.json_contracts import ERROR_SCHEMA, INPUT_SCHEMA, OUTPUT_SCHEMA
 
@@ -30,6 +43,10 @@ def _load_validation_error() -> type[_SchemaValidationError]:
 
 
 ValidationErrorType: type[_SchemaValidationError] = _load_validation_error()
+
+
+RUN_DIR_ENV_VAR = "RUN_ALL_RUN_DIR"
+_SMOKE_PLAN_NAMES = {"yahw_smoke", "astral_demo"}
 
 
 class XClsMakeYahwX:
@@ -68,6 +85,107 @@ def _build_context(
     if ctx is not None:
         namespace.parent_ctx = ctx
     return namespace
+
+
+def _maybe_generate_projection(
+    context_mapping: Mapping[str, object] | None
+) -> tuple[Path, str] | None:
+    if not context_mapping:
+        return None
+    plan_obj = context_mapping.get("plan")
+    plan_raw = str(plan_obj).strip() if isinstance(plan_obj, str) else None
+    plan_value = plan_raw.lower() if plan_raw else None
+    if not plan_value:
+        return None
+
+    canonical_plan = None
+    for known in _SMOKE_PLAN_NAMES:
+        if plan_value == known or plan_value.endswith(f"/{known}") or known in plan_value:
+            canonical_plan = known
+            break
+    if canonical_plan is None:
+        return None
+
+    run_dir_raw = os.environ.get(RUN_DIR_ENV_VAR)
+    if not run_dir_raw:
+        return None
+
+    run_dir = Path(run_dir_raw)
+    if not run_dir.exists():
+        return None
+    try:
+        snapshot = _build_demo_snapshot(canonical_plan)
+        snapshot_path = run_dir / f"astral_projection_{canonical_plan}.json"
+        write_snapshot(snapshot, snapshot_path)
+    except Exception:  # pragma: no cover - demo emission best-effort
+        return None
+    return snapshot_path, canonical_plan
+
+
+def _build_demo_snapshot(plan_name: str) -> ProjectionSnapshot:
+    begin = ProjectionNode(
+        id="seed",
+        form="Form_1",
+        operation="emit_seed",
+        module="x_make_yahw_x.demo",
+        parameters={"count": 3},
+        traits=("stateless",),
+    )
+    worker = ProjectionNode(
+        id="amplifier",
+        form="Form_2",
+        operation="amplify",
+        module="x_make_yahw_x.demo",
+        parameters={"factor": 2},
+    )
+    collector = ProjectionNode(
+        id="collector",
+        form="Form_3",
+        operation="collect",
+        module="x_make_yahw_x.demo",
+    )
+
+    network = ProjectionNetwork(
+        nodes=(begin, worker, collector),
+        edges=(
+            ProjectionEdge(source="seed", target="amplifier", channel="sequence"),
+            ProjectionEdge(source="amplifier", target="collector", channel="results"),
+        ),
+        entrypoints=("seed",),
+        sinks=("collector",),
+        execution_policy=ExecutionPolicy(batch_size=8, concurrency="sequential"),
+    )
+
+    origin = ProjectionOrigin(
+        workspace_root=str(Path.cwd()),
+        orchestrator="x_0_run_all_x",
+        git_revision=None,
+        extras={"plan": plan_name},
+    )
+
+    resources = ProjectionResources(
+        python_requirements=("x_make_yahw_x",),
+        data_bundles=(
+            ProjectionDataBundle(
+                id="demo_payload",
+                bundle_type="json",
+                description="Synthetic payload captured during YAHW smoke plan",
+            ),
+        ),
+    )
+
+    telemetry = ProjectionTelemetry(events=True, metrics=True, log_level="INFO")
+
+    snapshot_id = f"yahw_demo_{plan_name}".replace("-", "_")
+    description = "Demo astral snapshot emitted by YAHW smoke run"
+    return ProjectionSnapshot(
+        id=snapshot_id,
+        origin=origin,
+        network=network,
+        resources=resources,
+        telemetry=telemetry,
+        description=description,
+    )
 
 
 def main_json(
@@ -115,6 +233,16 @@ def main_json(
         context_keys = tuple(sorted(str(key) for key in context_mapping))
         metadata["context_keys"] = list(context_keys)
         metadata["context_entries"] = len(context_keys)
+    projection_result = _maybe_generate_projection(context_mapping)
+    if projection_result is not None:
+        snapshot_path, plan_name = projection_result
+        metadata["projection_snapshot"] = str(snapshot_path)
+        metadata["projection_plan"] = plan_name
+        existing_notes = metadata.get("notes")
+        if isinstance(existing_notes, list):
+            metadata["notes"] = [*existing_notes, "Auto-generated demo astral snapshot"]
+        else:
+            metadata["notes"] = ["Auto-generated demo astral snapshot"]
     if runtime_ctx is not ctx and runtime_ctx is not None and ctx is not None:
         metadata["parent_ctx_attached"] = True
 
