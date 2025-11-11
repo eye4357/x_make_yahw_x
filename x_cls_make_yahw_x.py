@@ -88,7 +88,7 @@ def _build_context(
 
 
 def _maybe_generate_projection(
-    context_mapping: Mapping[str, object] | None
+    context_mapping: Mapping[str, object] | None,
 ) -> tuple[Path, str] | None:
     if not context_mapping:
         return None
@@ -100,7 +100,11 @@ def _maybe_generate_projection(
 
     canonical_plan = None
     for known in _SMOKE_PLAN_NAMES:
-        if plan_value == known or plan_value.endswith(f"/{known}") or known in plan_value:
+        if (
+            plan_value == known
+            or plan_value.endswith(f"/{known}")
+            or known in plan_value
+        ):
             canonical_plan = known
             break
     if canonical_plan is None:
