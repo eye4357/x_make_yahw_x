@@ -243,10 +243,14 @@ def main_json(
         metadata["projection_snapshot"] = str(snapshot_path)
         metadata["projection_plan"] = plan_name
         existing_notes = metadata.get("notes")
-        if isinstance(existing_notes, list):
-            metadata["notes"] = [*existing_notes, "Auto-generated demo astral snapshot"]
+        if isinstance(existing_notes, Sequence) and not isinstance(
+            existing_notes, (str, bytes)
+        ):
+            notes = [str(entry) for entry in cast("Sequence[object]", existing_notes)]
+            notes.append("Auto-generated demo astral snapshot")
         else:
-            metadata["notes"] = ["Auto-generated demo astral snapshot"]
+            notes = ["Auto-generated demo astral snapshot"]
+        metadata["notes"] = notes
     if runtime_ctx is not ctx and runtime_ctx is not None and ctx is not None:
         metadata["parent_ctx_attached"] = True
 
