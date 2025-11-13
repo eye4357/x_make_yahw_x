@@ -111,17 +111,14 @@ def _maybe_generate_projection(
         return None
 
     run_dir_raw = os.environ.get(RUN_DIR_ENV_VAR)
-    if not run_dir_raw:
+    if not run_dir_raw or not Path(run_dir_raw).exists():
         return None
-
     run_dir = Path(run_dir_raw)
-    if not run_dir.exists():
-        return None
     try:
         snapshot = _build_demo_snapshot(canonical_plan)
         snapshot_path = run_dir / f"astral_projection_{canonical_plan}.json"
         write_snapshot(snapshot, snapshot_path)
-    except Exception:  # pragma: no cover - demo emission best-effort
+    except (OSError, RuntimeError, ValueError):  # pragma: no cover - demo best-effort
         return None
     return snapshot_path, canonical_plan
 
