@@ -6,6 +6,20 @@ I document every change to this intake canary here. Entries follow [Keep a Chang
 ### Documentation
 - Recorded the 2025-11-09 Environment Studio smoke run (`yahw_smoke` plan) and evidence locations in the operator README.
 
+## [0.20.7] - 2025-11-12
+### Fixed
+- Hardened the demo astral snapshot emission so smoke runs only write projections when the orchestrator run directory exists and silently swallow only expected I/O failures.
+
+## [0.20.6] - 2025-11-12
+### Changed
+- Normalized metadata note aggregation to accept any sequence input while guarding against accidental string concatenation.
+- Adopted the shared repo hygiene `.gitignore` so automation detritus and build artefacts stay out of version control.
+
+## [0.20.5] - 2025-11-11
+### Changed
+- Expanded the MyPy search path to cover neighbouring shared packages, keeping the astral gateway contract under type-check enforcement.
+- Reformatted the smoke plan matcher for readability before hook expansion.
+
 ## [0.20.4] - 2025-10-15
 ### Changed
 - README updated for the Road to 0.20.4 release, documenting the Kanban intake checks and exporter smoke tests this harness now performs.
