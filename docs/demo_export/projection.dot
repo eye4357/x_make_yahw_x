@@ -1,0 +1,8 @@
+digraph G {
+  graph [status_summary="{'has_all_forms': True, 'has_begin': True, 'has_execute': True, 'has_end': True, 'execution_policy_defined': True, 'missing_forms': []}", dimensions="{'node_count': 3, 'edge_count': 2, 'entrypoint_count': 1, 'sink_count': 1}", entrypoints="['seed']", sinks="['collector']", execution_policy="{'batch_size': 8, 'concurrency': 'sequential'}"]
+  "seed" [form="Form_1", operation="emit_seed", module="x_make_yahw_x.demo", parameters="{'count': 3}", traits="['stateless']", label="Form_1\nemit_seed"]
+  "amplifier" [form="Form_2", operation="amplify", module="x_make_yahw_x.demo", parameters="{'factor': 2}", label="Form_2\namplify"]
+  "collector" [form="Form_3", operation="collect", module="x_make_yahw_x.demo", label="Form_3\ncollect"]
+  "seed" -> "amplifier" [channel="sequence", source_form="Form_1", target_form="Form_2"]
+  "amplifier" -> "collector" [channel="results", source_form="Form_2", target_form="Form_3"]
+}
