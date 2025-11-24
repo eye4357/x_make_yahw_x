@@ -11,18 +11,33 @@ from pathlib import Path
 from types import SimpleNamespace
 from typing import IO, Protocol, cast
 
-from x_make_astrocyte_gateway_x import (
-    ExecutionPolicy,
-    ProjectionDataBundle,
-    ProjectionEdge,
-    ProjectionNetwork,
-    ProjectionNode,
-    ProjectionOrigin,
-    ProjectionResources,
-    ProjectionSnapshot,
-    ProjectionTelemetry,
-    write_snapshot,
-)
+if __package__ in {None, ""}:  # pragma: no cover - executed when run as a script
+    sys.path.append(str(Path(__file__).resolve().parent))
+    from projection import (  # type: ignore[import-not-found]
+        ExecutionPolicy,
+        ProjectionDataBundle,
+        ProjectionEdge,
+        ProjectionNetwork,
+        ProjectionNode,
+        ProjectionOrigin,
+        ProjectionResources,
+        ProjectionSnapshot,
+        ProjectionTelemetry,
+        write_snapshot,
+    )
+else:
+    from .projection import (
+        ExecutionPolicy,
+        ProjectionDataBundle,
+        ProjectionEdge,
+        ProjectionNetwork,
+        ProjectionNode,
+        ProjectionOrigin,
+        ProjectionResources,
+        ProjectionSnapshot,
+        ProjectionTelemetry,
+        write_snapshot,
+    )
 from x_make_common_x.json_contracts import validate_payload
 from x_make_yahw_x.json_contracts import ERROR_SCHEMA, INPUT_SCHEMA, OUTPUT_SCHEMA
 
