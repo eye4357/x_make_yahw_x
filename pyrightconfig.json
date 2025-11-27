@@ -1,14 +1,16 @@
-﻿{
+{
     "include": ["."],
     "stubPath": "../x_make_common_x/shared_typings",
+    "venvPath": "..",
+    "venv": ".venv",
     "executionEnvironments": [
         {
             "root": ".",
             "extraPaths": [
-                ".."
+                "..",
+                "../x_make_common_x"
             ]
         }
     ],
     "reportMissingModuleSource": "none"
 }
-
