@@ -15,6 +15,7 @@ if __package__ in {None, ""}:  # pragma: no cover - executed when run as a scrip
     sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from x_make_common_x.json_contracts import validate_payload
+
 from x_make_yahw_x.json_contracts import ERROR_SCHEMA, INPUT_SCHEMA, OUTPUT_SCHEMA
 from x_make_yahw_x.projection import (
     ExecutionPolicy,

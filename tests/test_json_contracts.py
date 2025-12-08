@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import cast
 
 from x_make_common_x.json_contracts import validate_payload, validate_schema
+
 from x_make_yahw_x.json_contracts import (
     ERROR_SCHEMA,
     INPUT_SCHEMA,
